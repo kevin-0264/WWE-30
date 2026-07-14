@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LAST ONE STANDING — Royal Rumble Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="grain"></div>
+
+<div class="loadscreen" id="loadscreen">
+  <div class="ls-title">ENTERING THE ARENA</div>
+  <div class="loadbar"><i id="loadbar-fill"></i></div>
+</div>
+
+<div class="topbar" id="topbar" style="display:none;">
+  <div class="brand">LAST ONE <span class="accent">STANDING</span></div>
+ <nav>
+    <button class="btn small ghost" data-go="home">Home</button>
+    <button class="btn small ghost" data-go="roster">Wrestlers</button>
+    <button class="btn small ghost" data-go="create-wrestler">Create Wrestler</button>
+    <button class="btn small ghost" data-go="championships">Championships</button>
+    <button class="btn small ghost" data-go="rivalries">Rivalries</button>
+    <button class="btn small ghost" data-go="single">Single Match</button>
+    <button class="btn small ghost" data-go="events">Events</button>
+    <button class="btn small ghost" data-go="highlights">Highlights</button> <button class="btn small ghost" data-go="testimonials">Testimonials</button>
+    <button class="btn small ghost" data-go="history">History</button>
+    <button class="btn small ghost" data-go="stats-dashboard">Statistics</button>
+    <button class="btn small ghost" data-go="rankings">Rankings</button>
+    <button class="btn small ghost" data-go="hall-of-fame">Hall of Fame</button>
+    <button class="btn small ghost" data-go="settings">Settings</button>
+  </nav>
+</div>
+
+<!-- HOME -->
+<section class="screen active" id="home">
+  <div class="ring-ropes"></div>
+  <div class="logo-wrap">
+    <div class="logo-eyebrow">THIRTY ENTER · ONE STANDS</div>
+    <h1 class="logo-main">LAST ONE<br><span class="accent">STANDING</span></h1>
+    <div class="logo-sub">A Women's Royal Rumble Simulator</div>
+  </div>
+  <div class="home-actions">
+    <button class="btn primary" data-go="roster" data-mode="rumble">Start Simulation</button>
+    <button class="btn" data-go="single">Single Match</button>
+    <button class="btn" data-go="roster" data-mode="browse">Wrestlers</button>
+    <button class="btn ghost" data-go="create-wrestler">Create Wrestler</button>
+    <button class="btn ghost" data-go="championships">Championships</button>
+    <button class="btn ghost" data-go="rivalries">Rivalries</button>
+    <button class="btn ghost" data-go="season-schedule">season-schedule</button>
+    
+    <button class="btn ghost" data-go="events">Upcoming Events</button>
+    <button class="btn ghost" data-go="highlights">Highlights</button> <button class="btn ghost" data-go="testimonials">Testimonials</button>
+    <button class="btn ghost" data-go="history">Match History</button>
+    <button class="btn ghost" data-go="stats-dashboard">Statistics</button>
+    <button class="btn ghost" data-go="rankings">Rankings</button>
+    <button class="btn ghost" data-go="hall-of-fame">Hall of Fame</button>
+    <button class="btn ghost" data-go="settings">Settings</button>
+  </div>
+</section>
+
+<!-- ROSTER / SELECTION -->
+<section class="screen" id="roster">
+  <div class="wrap">
+    <div class="section-title"><h2>The Roster</h2><span class="count" id="roster-count"></span></div>
+    <div class="toolbar">
+      <input type="text" id="search-input" placeholder="Search wrestler...">
+      <select id="filter-brand"><option value="">All Brands</option></select>
+      <select id="filter-sort">
+        <option value="ovr-desc">Sort: Overall ↓</option>
+        <option value="ovr-asc">Sort: Overall ↑</option>
+        <option value="name">Sort: Name A–Z</option>
+        <option value="pop">Sort: Popularity</option>
+      </select>
+      <button class="btn small" id="btn-random30">Random 30</button>
+      <button class="btn small ghost" id="btn-shuffle">Shuffle Entries</button>
+      <button class="btn small ghost" id="btn-reset">Reset</button>
+    </div>
+    <div class="selection-bar" id="selection-bar-wrap">
+      <div>Selected: <span class="num" id="sel-count">0</span> / 30 &nbsp; · &nbsp; Remaining slots: <span id="sel-remaining">30</span></div>
+      <button class="btn primary" id="btn-start-rumble" disabled>Start Royal Rumble →</button>
+    </div>
+    <div class="roster-grid" id="roster-grid"></div>
+  </div>
+</section>
+<div class="profile-modal hidden" id="profile-modal" aria-hidden="true">
+  <div class="profile-backdrop" id="profile-backdrop"></div>
+  <div class="profile-panel" role="dialog" aria-modal="true" aria-labelledby="profile-name">
+    <button class="btn small ghost profile-close" id="profile-close">× Close</button>
+    <div class="profile-grid">
+      <div class="profile-hero">
+        <div class="hero-slider" id="hero-slider">
+          <div class="hero-slider-caption" id="hero-slider-caption">1 / 1</div>
+          <button class="hero-slider-arrow prev" id="hero-prev" aria-label="Previous photo">‹</button>
+          <button class="hero-slider-arrow next" id="hero-next" aria-label="Next photo">›</button>
+          <div class="hero-slider-dots" id="hero-slider-dots"></div>
+        </div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-tags"><span id="profile-brand"></span><span id="profile-country"></span></div>
+        <h2 id="profile-name"></h2>
+        <p class="profile-nick" id="profile-nick"></p>
+        <p class="profile-bio" id="profile-bio"></p>
+        <div class="profile-meta">
+          <div class="meta-box"><b>Height</b><span id="profile-height"></span></div>
+          <div class="meta-box"><b>Weight</b><span id="profile-weight"></span></div>
+          <div class="meta-box"><b>Popularity</b><span id="profile-popularity"></span></div>
+          <div class="meta-box"><b>Championships</b><span id="profile-champs"></span></div>
+        </div>
+        <div class="profile-stats" id="profile-stats"></div>
+        <div class="profile-details">
+          <div class="detail-item"><b>Signature Moves</b><span id="profile-signature"></span></div>
+          <div class="detail-item"><b>Finisher</b><span id="profile-finisher"></span></div>
+          <div class="detail-item"><b>Rumble Wins</b><span id="profile-rumble"></span></div>
+          <div class="detail-item"><b>Total Matches</b><span id="profile-matches"></span></div>
+          <div class="detail-item"><b>Fiercest Rival</b><span id="profile-rival"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE WRESTLER -->
+<section class="screen" id="create-wrestler">
+  <div class="wrap">
+    <div class="section-title"><h2>Create Wrestler</h2><span class="count">Saved to this browser</span></div>
+    <div class="cw-layout">
+      <div class="cw-photo-box">
+        <div class="cw-photo-slots">
+          <div class="cw-photo-slot">
+            <label>Portrait</label>
+            <div class="cw-photo-preview" id="cw-photo-preview-portrait">No Photo</div>
+            <input type="file" accept="image/*" id="cw-photo-input-portrait">
+          </div>
+          <div class="cw-photo-slot">
+            <label>Roster Card</label>
+            <div class="cw-photo-preview" id="cw-photo-preview-roster">No Photo</div>
+            <input type="file" accept="image/*" id="cw-photo-input-roster">
+          </div>
+          <div class="cw-photo-slot">
+            <label>Ring Entrance</label>
+            <div class="cw-photo-preview" id="cw-photo-preview-entrance">No Photo</div>
+            <input type="file" accept="image/*" id="cw-photo-input-entrance">
+          </div>
+          <div class="cw-photo-slot">
+            <label>In-Match</label>
+            <div class="cw-photo-preview" id="cw-photo-preview-match">No Photo</div>
+            <input type="file" accept="image/*" id="cw-photo-input-match">
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--paper-dim);margin-top:10px;line-height:1.5;">All optional. If you only add one, it's reused for the others automatically.</div>
+      </div>
+      <div>
+        <div class="cw-form-grid">
+          <div class="cw-field"><label>Name</label><input type="text" id="cw-name" placeholder="e.g. Meera Sinha"></div>
+          <div class="cw-field"><label>Nickname</label><input type="text" id="cw-nick" placeholder="e.g. The Wildcard"></div>
+          <div class="cw-field"><label>Brand</label><select id="cw-brand"></select></div>
+          <div class="cw-field"><label>Country</label><select id="cw-country"></select></div>
+          <div class="cw-field"><label>Height</label><input type="text" id="cw-height" placeholder="5'8&quot;"></div>
+          <div class="cw-field"><label>Weight</label><input type="text" id="cw-weight" placeholder="140 lbs"></div>
+          <div class="cw-field"><label>Entrance</label><input type="text" id="cw-entrance" placeholder="e.g. Smoke &amp; strobe, walkout to a drum-heavy theme"></div>
+          <div class="cw-field"><label>Signature Moves</label><input type="text" id="cw-signature" placeholder="e.g. Springboard Crossbody / German Suplex"></div>
+        </div>
+        <div class="cw-form-grid full">
+          <div class="cw-field"><label>Finisher</label><input type="text" id="cw-finisher" placeholder="e.g. Midnight Reckoning"></div>
+          <div class="cw-field"><label>Bio</label><textarea id="cw-bio" placeholder="A short backstory for your wrestler..."></textarea></div>
+        </div>
+        <div class="cw-stats-wrap">
+          <h3>Stats</h3>
+          <div id="cw-stat-sliders"></div>
+          <div class="cw-overall-preview"><div class="num" id="cw-overall-preview">70</div><div class="lbl">Projected Overall</div></div>
+        </div>
+        <div style="margin-top:20px;text-align:right;">
+          <button class="btn primary" id="btn-create-wrestler">Create Wrestler</button>
+        </div>
+      </div>
+    </div>
+    <div class="cw-custom-list">
+      <div class="section-title"><h2 style="font-size:22px;">Your Custom Wrestlers</h2><span class="count" id="cw-custom-count"></span></div>
+      <div style="margin-bottom:14px;"><button class="btn small ghost" id="btn-clear-custom" style="border-color:var(--crimson-bright);color:var(--crimson-bright);">Clear All Custom Wrestlers</button></div>
+      <div class="roster-grid" id="cw-custom-grid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAMPIONSHIPS -->
+<section class="screen" id="championships">
+  <div class="wrap">
+    <div class="section-title"><h2>Championships</h2><span class="count" id="titles-count"></span></div>
+    <div class="titles-grid" id="titles-grid"></div>
+    <div class="rankings-panel">
+      <div class="section-title"><h2 style="font-size:24px;">Top Contenders</h2><span class="count">Ranked by Overall + Popularity</span></div>
+      <div class="rankings-list" id="rankings-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- RIVALRIES -->
+<section class="screen" id="rivalries">
+  <div class="wrap">
+    <div class="section-title"><h2>Rivalries</h2><span class="count" id="rivalries-count"></span></div>
+    <div class="rivalry-grid" id="rivalry-grid"></div>
+  </div>
+</section>
+
+<!-- STATISTICS DASHBOARD -->
+<section class="screen" id="stats-dashboard">
+  <div class="wrap">
+    <div class="section-title"><h2>Statistics Dashboard</h2><span class="count">All-time analytics</span></div>
+    <div class="stats-dash-grid">
+      <div class="stats-card">
+        <h3>🏆 Most Wins</h3>
+        <div id="stat-most-wins"></div>
+      </div>
+      <div class="stats-card">
+        <h3>💥 Most Eliminations</h3>
+        <div id="stat-most-elims"></div>
+      </div>
+      <div class="stats-card">
+        <h3>⏱️ Longest Survivor</h3>
+        <div class="record-box" id="stat-longest-survivor"></div>
+      </div>
+      <div class="stats-card">
+        <h3>⚡ Fastest Elimination</h3>
+        <div class="record-box" id="stat-fastest-elim"></div>
+      </div>
+      <div class="stats-card">
+        <h3>📊 Average Match Time</h3>
+        <div class="record-box" id="stat-avg-time"></div>
+      </div>
+      <div class="stats-card">
+        <h3>🏛 Championship History</h3>
+        <div id="stat-champ-history"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RANKINGS (TOP 50) -->
+<section class="screen" id="rankings">
+  <div class="wrap">
+    <div class="section-title"><h2>Power Rankings</h2><span class="count" id="rankings-count-full"></span></div>
+    <div class="rankings-full-list" id="rankings-full-list"></div>
+  </div>
+</section>
+
+<!-- HALL OF FAME -->
+<section class="screen" id="hall-of-fame">
+  <div class="wrap">
+    <div class="section-title"><h2>Hall of Fame</h2><span class="count" id="hof-count"></span></div>
+    <div style="color:var(--paper-dim);font-size:13px;margin-bottom:6px;">Reigning Champions</div>
+    <div class="hof-reigning-grid" id="hof-reigning-grid"></div>
+    <div id="hof-inducted-wrap"></div>
+  </div>
+</section>
+
+<!-- SIMULATION -->
+<section class="screen" id="sim-screen">
+  <div class="wrap" style="padding-bottom:0;">
+    <div class="section-title"><h2 id="sim-title">Royal Rumble — In Progress</h2></div>
+  </div>
+  <div class="ring-area">
+    <div class="crowd-reactions-layer" id="crowd-reactions-layer"></div>
+    <div class="jumbotron" id="jumbotron">
+      <div class="jumbotron-screen" id="jumbotron-screen">
+        <div class="jumbo-fallback" id="jumbo-fallback"></div>
+        <img id="jumbotron-img" src="" alt="" onerror="this.style.display='none'">
+      </div>
+      <div class="jumbotron-caption">
+        <div class="jc-num" id="jumbo-num"></div>
+        <div class="jc-name" id="jumbo-name"></div>
+        <div class="jc-nick" id="jumbo-nick"></div>
+      </div>
+    </div>
+    <div class="ring" id="ring">
+      <div class="crowd-glow"></div>
+      <div class="ropes-deco"></div>
+      <div class="entry-banner" id="entry-banner"></div>
+    </div>
+  </div>
+  <div class="sim-controls">
+    <button class="btn primary" id="btn-rumble-start">Begin Entrances</button>
+    <button class="btn" id="btn-pause" disabled>Pause</button>
+    <button class="btn" id="btn-speed" disabled>Speed: 1x</button>
+    <button class="btn ghost" id="btn-skip" disabled>Skip to Result</button>
+  </div>
+  <div class="sim-grid">
+    <div class="panel-box">
+      <h3>Match Clock</h3>
+      <div class="timer-big" id="match-clock">00:00</div>
+      <div class="next-up" id="next-up-text">Waiting to begin...</div>
+      <h3 style="margin-top:16px;">Live Totals</h3>
+      <div class="stat-line">In Ring: <b id="stat-inring">0</b></div>
+      <div class="stat-line">Eliminated: <b id="stat-elim">0</b></div>
+      <div class="stat-line">Entries Remaining: <b id="stat-remaining">30</b></div>
+      <div class="stat-line">Leader: <b id="stat-leader">—</b></div>
+      <div class="crowd-meter-wrap">
+        <div class="crowd-meter-label"><span>Crowd Meter</span><span id="crowd-meter-pct">50%</span></div>
+        <div class="crowd-meter-track"><div class="crowd-meter-fill" id="crowd-meter-fill" style="width:50%;"></div></div>
+        <div class="crowd-meter-desc" id="crowd-meter-desc">Warming Up</div>
+      </div>
+    </div>
+    <div class="panel-box">
+      <h3>Commentary</h3>
+      <div class="commentary-feed" id="commentary-feed"></div>
+    </div>
+    <div class="panel-box">
+      <h3>Leaderboard</h3>
+      <div id="leaderboard"></div>
+    </div>
+  </div>
+</section>
+
+<!-- VICTORY -->
+<section class="screen" id="victory-screen-wrap">
+  <div class="wrap victory-screen" id="victory-content"></div>
+</section>
+
+<!-- SINGLE MATCH -->
+<section class="screen" id="single">
+  <div class="wrap">
+    <div class="section-title"><h2>Single Match</h2></div>
+    <div style="max-width:420px;margin:0 auto 20px;">
+      <label style="display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Title On The Line</label>
+      <select id="pickTitle" style="width:100%;padding:12px;background:var(--panel);color:var(--paper);border:1px solid #3a322a;"></select>
+    </div>
+    <div class="vs-grid" id="vs-pickers">
+      <div>
+        <select id="pickA" style="width:100%;padding:12px;background:var(--panel);color:var(--paper);border:1px solid #3a322a;"></select>
+        <div id="cardA" style="margin-top:14px;"></div>
+      </div>
+      <div class="vs-mid">VS</div>
+      <div>
+        <select id="pickB" style="width:100%;padding:12px;background:var(--panel);color:var(--paper);border:1px solid #3a322a;"></select>
+        <div id="cardB" style="margin-top:14px;"></div>
+      </div>
+    </div>
+    <div id="compare-table" style="margin-top:24px;"></div>
+    <div style="text-align:center;margin-top:24px;">
+      <button class="btn primary" id="btn-single-start">Start Match</button>
+    </div>
+    <div id="single-result" style="margin-top:24px;"></div>
+  </div>
+</section>
+<!-- EVENTS -->
+ <section class="screen" id="events">
+  <div class="wrap">
+    <div class="section-title">
+      <h2>Upcoming Events</h2>
+      <span class="count" id="events-count"></span>
+    </div>
+    <div class="events-grid" id="events-grid"></div>
+  </div>
+</section>
+<!-- HIGHLIGHTS -->
+ <section class="screen" id="highlights">
+  <div class="wrap">
+    <div class="section-title">
+      <h2>Match Highlights</h2>
+      <span class="count" id="highlights-count"></span>
+    </div>
+    <div class="highlights-grid" id="highlights-grid"></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="screen" id="testimonials">
+  <div class="wrap">
+    <div class="section-title"><h2>Locker Room Talk</h2><span class="count">In their own words</span></div>
+    <div id="testimonial-featured-wrap"></div>
+    <div class="testimonial-grid" id="testimonial-grid"></div>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section class="screen" id="history">
+  <div class="wrap">
+    <div class="section-title"><h2>Match History</h2></div>
+    <div id="history-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+  </div>
+</section>
+<!-- ============================================================
+     SEASON SCHEDULE — integration snippet
+     Drop-in addition. Does not modify any other section.
+
+     1) Add this stylesheet in <head>, after style.css:
+        <link rel="stylesheet" href="season-schedule.css">
+
+     2) Add this nav button inside <nav> in .topbar (anywhere you like):
+        <button class="btn small ghost" data-go="season-schedule">Season Schedule</button>
+
+     3) Add this button inside .home-actions on the #home screen:
+        <button class="btn ghost" data-go="season-schedule">Season Schedule</button>
+
+     4) Paste the <section id="season-schedule"> block below anywhere among
+        the other <section class="screen"> blocks (e.g. right after #events).
+
+     5) Add this script tag at the very end, after your other scripts:
+        <script src="season-schedule.js"></script>
+
+     Uses the existing global ROSTER array + showScreen() if present.
+     Falls back to its own demo roster if ROSTER isn't found, so the
+     section still works stand-alone.
+============================================================ -->
+
+<section class="screen" id="season-schedule">
+  <div class="wrap">
+
+    <div class="section-title">
+      <h2>Season Schedule</h2>
+      <span class="count" id="ss-count"></span>
+    </div>
+
+    <!-- Reigning champion spotlight -->
+    <div class="ss-champion-banner" id="ss-champion-banner"></div>
+
+    <!-- Countdown to next bout -->
+    <div class="ss-countdown-card" id="ss-countdown-card"></div>
+
+    <!-- Top 3 ranking strip -->
+    <div class="ss-rankings-strip" id="ss-rankings-strip"></div>
+
+    <!-- Toolbar -->
+    <div class="ss-toolbar">
+      <button class="btn primary" id="ss-btn-generate">⚡ Generate Season Schedule</button>
+      <button class="btn ghost" id="ss-btn-create-match">+ Create Custom Match</button>
+      <select id="ss-filter-status">
+        <option value="all">All Matches</option>
+        <option value="upcoming">Upcoming Only</option>
+        <option value="completed">Completed Only</option>
+      </select>
+      <select id="ss-filter-type">
+        <option value="">All Types</option>
+        <option value="singles">Singles</option>
+        <option value="tag">Tag Team</option>
+        <option value="triple_threat">Triple Threat</option>
+        <option value="battle_royal">Battle Royal</option>
+        <option value="royal_rumble">Royal Rumble</option>
+      </select>
+      <button class="btn small ghost" id="ss-btn-reset">Reset Season</button>
+    </div>
+
+    <!-- Custom match builder -->
+    <div class="ss-create-panel hidden" id="ss-create-panel">
+      <div class="ss-create-head">
+        <h3>Create Custom Match</h3>
+        <span class="ss-tag-singles">Singles Match</span>
+      </div>
+      <div class="ss-create-grid">
+        <div class="ss-field">
+          <label>Date</label>
+          <input type="date" id="ss-cm-date">
+        </div>
+        <div class="ss-field">
+          <label>Start Time</label>
+          <input type="time" id="ss-cm-time" value="19:00">
+        </div>
+        <div class="ss-field">
+          <label>Title On The Line? (optional)</label>
+          <input type="text" id="ss-cm-title" placeholder="e.g. Interbrand Championship">
+        </div>
+      </div>
+
+      <div class="ss-vs-builder">
+        <div class="ss-vs-side">
+          <label>Wrestler A</label>
+          <select id="ss-cm-wa"></select>
+          <div class="ss-wrestler-container" id="ss-cm-preview-a"></div>
+        </div>
+        <div class="ss-vs-divider">VS</div>
+        <div class="ss-vs-side">
+          <label>Wrestler B</label>
+          <select id="ss-cm-wb"></select>
+          <div class="ss-wrestler-container" id="ss-cm-preview-b"></div>
+        </div>
+      </div>
+
+      <div class="ss-ticket-row">
+        <div class="ss-ticket-preview" id="ss-cm-ticket-preview"></div>
+        <button class="btn small ghost" id="ss-btn-reroll-prize">🎟️ Reroll Ticket Prize</button>
+      </div>
+
+      <div class="ss-create-actions">
+        <button class="btn ghost" id="ss-btn-cancel-match">Cancel</button>
+        <button class="btn primary" id="ss-btn-save-match">Add Match to Schedule</button>
+      </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="ss-schedule-list" id="ss-schedule-list"></div>
+
+  </div>
+</section>
+<!-- SETTINGS -->
+<section class="screen" id="settings">
+  <div class="wrap" style="max-width:640px;">
+    <div class="section-title"><h2>Settings</h2></div>
+    <div class="panel-box">
+      <div class="stat-line"><span>Match Speed</span></div>
+      <input type="range" id="set-speed" min="1" max="3" value="1" style="width:100%;">
+      <div class="stat-line"><span>Entry Interval (seconds)</span></div>
+      <input type="range" id="set-interval" min="4" max="15" value="10" style="width:100%;">
+      <div id="set-interval-label" style="font-size:12px;color:var(--gold);margin:-4px 0 10px;">10s</div>
+      <div class="stat-line"><span>Difficulty Variance</span></div>
+      <input type="range" id="set-variance" min="0" max="2" value="1" style="width:100%;">
+      <div style="margin-top:24px;padding-top:18px;border-top:1px solid rgba(212,175,55,.15);">
+        <div class="stat-line"><span>🎙️ AI Voice Commentary</span>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="set-voice-enabled" style="width:18px;height:18px;">
+          </label>
+        </div>
+        <div style="font-size:11px;color:var(--paper-dim);margin:-4px 0 14px;">Speaks big moments aloud during Royal Rumbles and Single Matches using your browser's built-in voices.</div>
+        <div class="stat-line"><span>Commentator Voice</span></div>
+        <select id="set-voice-select" style="width:100%;padding:10px;background:var(--panel);color:var(--paper);border:1px solid #3a322a;margin-bottom:10px;"></select>
+        <div class="stat-line"><span>Speech Rate</span></div>
+        <input type="range" id="set-voice-rate" min="0.7" max="1.6" step="0.05" value="1.1" style="width:100%;">
+        <div style="margin-top:14px;"><button class="btn small ghost" id="btn-voice-test">🔊 Test Voice</button></div>
+      </div>
+      <div style="margin-top:18px;"><button class="btn small ghost" id="btn-settings-reset">Reset to Defaults</button></div>
+    </div>
+    <div class="panel-box" style="margin-top:20px;">
+      <h3 style="font-size:14px;color:var(--gold);letter-spacing:.1em;margin:0 0 14px;">🎨 Arena Theme</h3>
+      <div class="theme-swatch-grid" id="theme-swatch-grid"></div>
+    </div>
+  </div>
+</section>
+<script src="wreslers.js"></script>
+<script src="theme-switcher.js"></script>
+<script src="championship.js"></script>
+<script src="custom.js"></script>
+<script src="rivalry.js"></script>
+<script src="statistics.js"></script>
+<script src="ranking.js"></script>
+<script src="fame.js"></script>
+<script src="crowd.js"></script>
+<script src="testimonials.js"></script>
+<script src="rumble.js"></script>
+<script src="event.js"></script>
+<script src="schedule.js"></script>
+<script>
+/* ============================================================
+   LAST ONE STANDING — Royal Rumble Simulator
+   Original fictional roster. No real-world likenesses, names,
+   music, or video are used — assets are generated/abstracted.
+============================================================ */
+
+/* ---------- NAVIGATION ---------- */
+document.querySelectorAll('[data-go]').forEach(btn=>{
+  btn.addEventListener('click',()=> showScreen(btn.dataset.go));
+});
+
+/* ---------- LOAD SCREEN ---------- */
+window.addEventListener('load',()=>{
+  let p=0;
+  const fill=document.getElementById('loadbar-fill');
+  const iv=setInterval(()=>{
+    p+=8+Math.random()*14;
+    fill.style.width=Math.min(p,100)+'%';
+    if(p>=100){
+      clearInterval(iv);
+      setTimeout(()=>{
+        const ls=document.getElementById('loadscreen');
+        ls.style.opacity='0';
+        setTimeout(()=>ls.remove(),650);
+      },250);
+    }
+  },140);
+});
+
+/* ---------- ROSTER RENDER ---------- */
+function brandOptions(){
+  const sel = document.getElementById('filter-brand');
+  if(sel.options.length>1) return;
+  BRANDS.forEach(b=>{
+    const o=document.createElement('option'); o.value=b; o.textContent=b; sel.appendChild(o);
+  });
+}
+function statBarsHTML(w){
+  const stats=[['STR',w.strength],['SPD',w.speed],['STA',w.stamina],['AGI',w.agility],['TEC',w.technique],['PWR',w.power],['MND',w.mind],['DEF',w.defense]];
+  return `<div class="statbars">${stats.map(([l,v])=>`<div class="sbar-row"><span class="label">${l}</span><div class="sbar-track"><div class="sbar-fill" style="width:${v}%"></div></div></div>`).join('')}</div>`;
+}
+function cardHTML(w){
+  const entryIdx = state.selected.indexOf(w.id);
+  const selected = entryIdx>-1;
+  return `<div class="wcard ${selected?'selected':''}" data-id="${w.id}" ${selected?`data-entry="${entryIdx+1}"`:''}>
+    <div class="wportrait">
+      ${w.photo ? `<img src="${w.photo}" alt="${w.name}" onerror="this.style.display='none'">` : `<span class="initials">${initials(w.name)}</span>`}
+    </div>
+    <h3 class="wname">${w.name}</h3>
+    <p class="wnick">"${w.nick}"</p>
+    <div class="wmeta"><span>${w.brand}</span><span>${w.country}</span></div>
+    <div class="wrating"><span style="color:var(--paper-dim)">Win Rate ${w.winRate}%</span><span class="ovr">${w.overall}</span></div>
+    <div class="profile-actions"><button class="btn small ghost profile-btn" onclick="openProfile(${w.id}); event.stopPropagation();">View Profile</button></div>
+    ${statBarsHTML(w)}
+  </div>`;
+}
+function renderRoster(){
+  brandOptions();
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const brand = document.getElementById('filter-brand').value;
+  const sort = document.getElementById('filter-sort').value;
+  let list = ROSTER.filter(w=> w.name.toLowerCase().includes(search) || w.nick.toLowerCase().includes(search));
+  if(brand) list = list.filter(w=>w.brand===brand);
+  if(sort==='ovr-desc') list.sort((a,b)=>b.overall-a.overall);
+  if(sort==='ovr-asc') list.sort((a,b)=>a.overall-b.overall);
+  if(sort==='name') list.sort((a,b)=>a.name.localeCompare(b.name));
+  if(sort==='pop') list.sort((a,b)=>b.popularity-a.popularity);
+  document.getElementById('roster-count').textContent = `${list.length} of ${ROSTER.length}`;
+  document.getElementById('roster-grid').innerHTML = list.map(cardHTML).join('');
+  document.querySelectorAll('.wcard').forEach(card=>{
+    card.addEventListener('click',()=> toggleSelect(parseInt(card.dataset.id)));
+  });
+  updateSelectionBar();
+}
+function openProfile(id){
+  const wrestler = ROSTER.find(w=>w.id===id);
+  if(!wrestler) return;
+  document.getElementById('profile-name').textContent = wrestler.name;
+  document.getElementById('profile-nick').textContent = `"${wrestler.nick}"`;
+  document.getElementById('profile-brand').textContent = wrestler.brand;
+  document.getElementById('profile-country').textContent = wrestler.country;
+  document.getElementById('profile-bio').textContent = wrestler.bio;
+  document.getElementById('profile-height').textContent = wrestler.height;
+  document.getElementById('profile-weight').textContent = wrestler.weight;
+  document.getElementById('profile-popularity').textContent = `${wrestler.popularity}%`;
+  const heldTitles = wrestlerTitles(wrestler.id);
+  document.getElementById('profile-champs').textContent = heldTitles.length ? heldTitles.join(', ') : `${wrestler.championships} (career)`;
+  const rival = topRivalFor(wrestler.id);
+  document.getElementById('profile-rival').textContent = rival ? `${rival.name} (${'★'.repeat(rival.level)})` : 'None yet';
+  document.getElementById('profile-signature').textContent = wrestler.signature;
+  document.getElementById('profile-finisher').textContent = wrestler.finisher;
+  document.getElementById('profile-rumble').textContent = wrestler.rumbleWins;
+  document.getElementById('profile-matches').textContent = wrestler.totalMatches;
+  document.getElementById('profile-stats').innerHTML = [
+    ['STR', wrestler.strength], ['SPD', wrestler.speed], ['STA', wrestler.stamina], ['AGI', wrestler.agility],
+    ['TEC', wrestler.technique], ['PWR', wrestler.power], ['MND', wrestler.mind], ['DEF', wrestler.defense]
+  ].map(([label,value])=>
+    `<div class="stat-item"><span class="label">${label}</span><span class="value">${value}</span></div>`
+  ).join('');
+  initHeroSlider(wrestler);
+  const modal = document.getElementById('profile-modal');
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden','false');
+}
+function closeProfile(){
+  const modal = document.getElementById('profile-modal');
+  modal.classList.add('hidden');
+  modal.setAttribute('aria-hidden','true');
+  stopHeroAutoplay();
+}
+
+document.getElementById('profile-close').addEventListener('click', closeProfile);
+document.getElementById('profile-backdrop').addEventListener('click', closeProfile);
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') closeProfile();
+  if(!document.getElementById('profile-modal').classList.contains('hidden')){
+    if(e.key==='ArrowRight') heroNext();
+    if(e.key==='ArrowLeft') heroPrev();
+  }
+});
+
+/* ---------- PROFILE IMAGE SLIDER ---------- */
+const heroState = { images: [], index: 0, timer: null, wrestlerLabel: '' };
+function initHeroSlider(wrestler){
+  const candidates = [
+    { src: wrestler.profileDetail || wrestler.profilePic, label: 'Portrait' },
+    { src: wrestler.profilePic, label: 'Roster Card' },
+    { src: wrestler.screenEntry, label: 'Ring Entrance' },
+    { src: wrestler.matchImage, label: 'In-Match' }
+  ].filter(c => c.src);
+  // de-duplicate identical image paths while keeping first label
+  const seen = new Set();
+  heroState.images = candidates.filter(c=>{
+    if(seen.has(c.src)) return false;
+    seen.add(c.src); return true;
+  });
+  if(heroState.images.length===0){
+    heroState.images = [{ src:'', label:'Portrait' }];
+  }
+  heroState.index = 0;
+  heroState.wrestlerLabel = wrestler.name;
+  heroState.fallbackInitials = initials(wrestler.name);
+  renderHeroSlider();
+  startHeroAutoplay();
+}
+function renderHeroSlider(){
+  const slider = document.getElementById('hero-slider');
+  slider.querySelectorAll('.hero-slide').forEach(n=>n.remove());
+  const dotsWrap = document.getElementById('hero-slider-dots');
+  dotsWrap.innerHTML='';
+  heroState.images.forEach((im,i)=>{
+    const slide = document.createElement('div');
+    slide.className = 'hero-slide' + (i===heroState.index ? ' active':'');
+    slide.dataset.idx = i;
+    if(im.src){
+      slide.innerHTML = `<img src="${im.src}" alt="${heroState.wrestlerLabel} — ${im.label}" onerror="this.closest('.hero-slide').innerHTML='<div style=&quot;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;color:#fff;font-family:Anton,sans-serif;font-size:44px;&quot;>${heroState.fallbackInitials}</div>'">`;
+    } else {
+      slide.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;color:#fff;font-family:Anton,sans-serif;font-size:44px;">${heroState.fallbackInitials}</div>`;
+    }
+    slider.insertBefore(slide, slider.firstChild);
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i===heroState.index ? ' active':'');
+    dot.addEventListener('click', ()=> heroGoTo(i));
+    dotsWrap.appendChild(dot);
+  });
+  document.getElementById('hero-slider-caption').textContent = `${heroState.images[heroState.index].label} · ${heroState.index+1} / ${heroState.images.length}`;
+  const multi = heroState.images.length>1;
+  document.getElementById('hero-prev').style.display = multi ? 'flex':'none';
+  document.getElementById('hero-next').style.display = multi ? 'flex':'none';
+}
+function heroGoTo(i){
+  heroState.index = (i+heroState.images.length) % heroState.images.length;
+  document.querySelectorAll('#hero-slider .hero-slide').forEach(s=> s.classList.toggle('active', parseInt(s.dataset.idx)===heroState.index));
+  document.querySelectorAll('#hero-slider-dots .dot').forEach((d,idx)=> d.classList.toggle('active', idx===heroState.index));
+  document.getElementById('hero-slider-caption').textContent = `${heroState.images[heroState.index].label} · ${heroState.index+1} / ${heroState.images.length}`;
+  restartHeroAutoplay();
+}
+function heroNext(){ heroGoTo(heroState.index+1); }
+function heroPrev(){ heroGoTo(heroState.index-1); }
+function startHeroAutoplay(){
+  stopHeroAutoplay();
+  if(heroState.images.length>1){
+    heroState.timer = setInterval(heroNext, 4200);
+  }
+}
+function stopHeroAutoplay(){ if(heroState.timer){ clearInterval(heroState.timer); heroState.timer=null; } }
+function restartHeroAutoplay(){ startHeroAutoplay(); }
+document.getElementById('hero-prev').addEventListener('click', heroPrev);
+document.getElementById('hero-next').addEventListener('click', heroNext);
+function toggleSelect(id){
+  const idx = state.selected.indexOf(id);
+  if(idx>-1){ state.selected.splice(idx,1); }
+  else { if(state.selected.length>=30) return; state.selected.push(id); }
+  renderRoster();
+}
+function updateSelectionBar(){
+  document.getElementById('sel-count').textContent = state.selected.length;
+  document.getElementById('sel-remaining').textContent = 30-state.selected.length;
+  document.getElementById('btn-start-rumble').disabled = state.selected.length!==30;
+}
+document.getElementById('search-input').addEventListener('input', renderRoster);
+document.getElementById('filter-brand').addEventListener('change', renderRoster);
+document.getElementById('filter-sort').addEventListener('change', renderRoster);
+document.getElementById('btn-random30').addEventListener('click',()=>{
+  const ids = ROSTER.map(w=>w.id);
+  for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+  state.selected = ids.slice(0,30);
+  renderRoster();
+});
+document.getElementById('btn-shuffle').addEventListener('click',()=>{
+  for(let i=state.selected.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [state.selected[i],state.selected[j]]=[state.selected[j],state.selected[i]]; }
+  renderRoster();
+});
+document.getElementById('btn-reset').addEventListener('click',()=>{ state.selected=[]; renderRoster(); });
+document.getElementById('btn-start-rumble').addEventListener('click',()=>{ showScreen('sim-screen'); initRumbleScreen(); });
+
+/* ============================================================
+   SETTINGS
+============================================================ */
+document.getElementById('set-speed').addEventListener('input', e=> state.settings.speed = parseInt(e.target.value));
+document.getElementById('set-interval').addEventListener('input', e=>{
+  state.settings.interval = parseInt(e.target.value);
+  document.getElementById('set-interval-label').textContent = state.settings.interval+'s';
+});
+document.getElementById('set-variance').addEventListener('input', e=> state.settings.variance = parseInt(e.target.value));
+document.getElementById('btn-settings-reset').addEventListener('click',()=>{
+  state.settings.speed=1; state.settings.interval=10; state.settings.variance=1;
+  document.getElementById('set-speed').value=1;
+  document.getElementById('set-interval').value=10;
+  document.getElementById('set-interval-label').textContent='10s';
+  document.getElementById('set-variance').value=1;
+});
+
+/* ---------- VOICE COMMENTARY SETTINGS ---------- */
+function initVoiceSettingsUI(){
+  const enabledBox = document.getElementById('set-voice-enabled');
+  const rateSlider = document.getElementById('set-voice-rate');
+  const voiceSel = document.getElementById('set-voice-select');
+  const testBtn = document.getElementById('btn-voice-test');
+  enabledBox.checked = !!state.settings.voiceEnabled;
+  rateSlider.value = state.settings.voiceRate || 1.1;
+  if(!('speechSynthesis' in window)){
+    voiceSel.innerHTML = `<option>Voice not supported in this browser</option>`;
+    enabledBox.disabled = true; testBtn.disabled = true;
+    return;
+  }
+  refreshVoiceList();
+  enabledBox.addEventListener('change', e=>{
+    state.settings.voiceEnabled = e.target.checked;
+    saveVoiceSettings();
+    if(state.settings.voiceEnabled) speakLine("OH MY GOD! Voice commentary is now LIVE!");
+  });
+  voiceSel.addEventListener('change', e=>{ state.settings.voiceName = e.target.value; saveVoiceSettings(); });
+  rateSlider.addEventListener('input', e=>{ state.settings.voiceRate = parseFloat(e.target.value); saveVoiceSettings(); });
+  testBtn.addEventListener('click', ()=>{
+    const wasEnabled = state.settings.voiceEnabled;
+    state.settings.voiceEnabled = true;
+    speakLine(pick(COMM_FINISH.concat(COMM_ELIM)).replace(/\{[^}]+\}/g,'').trim() || "OH MY GOD! What a match this has been! The referee can't believe it!");
+    state.settings.voiceEnabled = wasEnabled;
+  });
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = refreshVoiceList;
+}
+document.addEventListener('DOMContentLoaded', initVoiceSettingsUI);
+
+
+</script>
+</body>
+</html>
